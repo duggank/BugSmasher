@@ -1,0 +1,8 @@
+C:\Users\Kyle\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\bin\x86\Debug\BugSmasher.exe
+C:\Users\Kyle\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\bin\x86\Debug\BugSmasher.pdb
+C:\Users\Kyle\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\obj\x86\Debug\BugSmasher.csprojResolveAssemblyReference.cache
+C:\Users\Kyle\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\obj\x86\Debug\Microsoft.Xna.Framework.RuntimeProfile.txt
+C:\Users\Kyle\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\obj\x86\Debug\BugSmasher.exe
+C:\Users\Kyle\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\obj\x86\Debug\BugSmasher.pdb
+C:\Users\Kyle\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\bin\x86\Debug\Content\background.xnb
+C:\Users\Kyle\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\bin\x86\Debug\Content\spritesheet.xnb
