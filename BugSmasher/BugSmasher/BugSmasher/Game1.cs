@@ -21,8 +21,10 @@ namespace BugSmasher
         Texture2D background;
         Texture2D spriteSheet;
         Random rand = new Random();
-
-        Sprite brbug1;
+        float bloopTime = 1.0f;
+        float remainTime = 0.0f;
+        List<Sprite> brbugs = new List<Sprite>();
+        Sprite Cursor;
 
 
         public Game1()
@@ -40,7 +42,7 @@ namespace BugSmasher
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            this.IsMouseVisible = true;
+            this.IsMouseVisible = false;
 
             base.Initialize();
         }
@@ -57,7 +59,9 @@ namespace BugSmasher
             spriteSheet = Content.Load<Texture2D>("spritesheet");
 
             // TODO: use this.Content to load your game content here
-            brbug1 = new Sprite(new Vector2(rand.Next(0, 18), rand.Next(0, 450)), spriteSheet, new Rectangle(6, 15, 50, 31), Vector2.Zero);
+            
+            Cursor = new Sprite(new Vector2(40, 40), spriteSheet, new Rectangle(137, 198, 44, 53), Vector2.Zero);
+            Spawnbrbug(new Vector2(rand.Next(0, 18), rand.Next(0, 450)), Vector2.Zero);
         }
 
         /// <summary>
@@ -67,6 +71,13 @@ namespace BugSmasher
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+        }
+
+        public void Spawnbrbug(Vector2 location, Vector2 velocity)
+        {
+            Sprite brbug = new Sprite(location, spriteSheet, new Rectangle(6, 15, 53, 32), velocity);
+
+            brbugs.Add(brbug);
         }
 
         /// <summary>
@@ -81,18 +92,46 @@ namespace BugSmasher
             // Allows the game to exit
             if (CurrentKeyboardState.IsKeyDown(Keys.Escape))
                 this.Exit();
-            
-                brbug1.Update(gameTime);
-                brbug1.Velocity = new Vector2(rand.Next(75, 130), 21);
-                if (brbug1.Velocity.Y >= 20 && brbug1.Velocity.Y <= 24)
+            Cursor.Update(gameTime);
+            Cursor.Location = new Vector2(ms.X - 10, ms.Y - 15);
+            Cursor.Velocity = new Vector2(ms.X, ms.Y);
+
+            for (int i = brbugs.Count - 1; i >= 0; i--)
+            {
+                brbugs[i].Update(gameTime);
+
+                Vector2 location = new Vector2(new Vector2(rand.Next(0, 18), rand.Next(0, 450));
+                Vector2 velocity = new Vector2(40, 0);
+
+                // Zombie logic goes here.. 
+                brbugs[i].FlipHorizontal = false;
+                brbugs[i].FlipHorizontal = brbugs[i].Velocity.X > 0;
+
+                if (brbugs[i].Location.X <= 0)
                 {
-                    brbug1.Rotation = brbug1.Rotation + 0.2f;
-                    if (brbug1.Rotation >= 0.6f)
+                    brbugs[i].Velocity = new Vector2(40, 0);
+                }
+                if (brbugs[i].Location.X > 900)
+                {
+                    brbugs[i].Velocity = new Vector2(-40, 0);
+                }
+
+                if (ms.LeftButton == ButtonState.Pressed && Cursor.IsBoxColliding(brbugs[i].BoundingBoxRect))
+                {
+
+                }
+
+                brbugs[i].Velocity = new Vector2(rand.Next(75, 130), 21);
+
+                if (brbugs[i].Velocity.Y >= 20 && brbugs[i].Velocity.Y <= 24)
+                {
+                    brbugs[i].Rotation = brbugs[i].Rotation + 0.2f;
+                    if (brbugs[i].Rotation >= 0.6f)
                     {
-                        brbug1.Rotation -= 0.2f;
+                        brbugs[i].Rotation -= 0.2f;
                     }
                 }
-            
+            }
 
             // TODO: Add your update logic here
 
@@ -109,8 +148,11 @@ namespace BugSmasher
             spriteBatch.Begin();
 
             spriteBatch.Draw(background, Vector2.Zero, Color.White);
-
-            brbug1.Draw(spriteBatch);
+            for (int c = 0; c < brbugs.Count; c++)
+            {
+                brbugs[c].Draw(spriteBatch);
+            }           
+            Cursor.Draw(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
         }

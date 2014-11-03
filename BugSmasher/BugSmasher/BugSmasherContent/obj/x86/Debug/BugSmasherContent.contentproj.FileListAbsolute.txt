@@ -1,1 +1,2 @@
 C:\Users\Kyle\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasherContent\obj\x86\Debug\BugSmasherContent.contentprojResolveAssemblyReference.cache
+C:\Users\eahscs\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasherContent\obj\x86\Debug\BugSmasherContent.contentprojResolveAssemblyReference.cache

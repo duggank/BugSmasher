@@ -186,5 +186,10 @@ namespace BugSmasher
                 0.0f);
         }
 
+
+        internal void RemoveAt()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
