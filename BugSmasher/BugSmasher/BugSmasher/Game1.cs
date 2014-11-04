@@ -23,7 +23,7 @@ namespace BugSmasher
         Random rand = new Random();
         float bloopTime = 1.0f;
         float remainTime = 0.0f;
-        List<Sprite> brbugs = new List<Sprite>();
+        List<Sprite> bugs = new List<Sprite>();
         Sprite Cursor;
 
 
@@ -61,7 +61,7 @@ namespace BugSmasher
             // TODO: use this.Content to load your game content here
             
             Cursor = new Sprite(new Vector2(40, 40), spriteSheet, new Rectangle(137, 198, 44, 53), Vector2.Zero);
-            Spawnbrbug(new Vector2(rand.Next(0, 18), rand.Next(0, 450)), Vector2.Zero);
+            Spawnbug1(new Vector2(rand.Next(0, 18), rand.Next(0, 450)), Vector2.Zero);
         }
 
         /// <summary>
@@ -73,11 +73,11 @@ namespace BugSmasher
             // TODO: Unload any non ContentManager content here
         }
 
-        public void Spawnbrbug(Vector2 location, Vector2 velocity)
+        public void Spawnbug1(Vector2 location, Vector2 velocity)
         {
             Sprite brbug = new Sprite(location, spriteSheet, new Rectangle(6, 15, 53, 32), velocity);
 
-            brbugs.Add(brbug);
+            bugs.Add(brbug);
         }
 
         /// <summary>
@@ -92,45 +92,48 @@ namespace BugSmasher
             // Allows the game to exit
             if (CurrentKeyboardState.IsKeyDown(Keys.Escape))
                 this.Exit();
+
             Cursor.Update(gameTime);
             Cursor.Location = new Vector2(ms.X - 10, ms.Y - 15);
             Cursor.Velocity = new Vector2(ms.X, ms.Y);
 
-            for (int i = brbugs.Count - 1; i >= 0; i--)
+            Vector2 location = new Vector2(rand.Next(0, 18), rand.Next(0, 450));
+            Vector2 velocity = new Vector2(rand.Next(-130, 130), rand.Next(-25, 25));
+
+            for (int i = bugs.Count - 1; i >= 0; i--)
             {
-                brbugs[i].Update(gameTime);
+                bugs[i].Update(gameTime);
 
-                Vector2 location = new Vector2(new Vector2(rand.Next(0, 18), rand.Next(0, 450));
-                Vector2 velocity = new Vector2(40, 0);
+                bugs[i].FlipHorizontal = false;
 
-                // Zombie logic goes here.. 
-                brbugs[i].FlipHorizontal = false;
-                brbugs[i].FlipHorizontal = brbugs[i].Velocity.X > 0;
+                
 
-                if (brbugs[i].Location.X <= 0)
+                if (bugs[i].Location.X <= 0)
                 {
-                    brbugs[i].Velocity = new Vector2(40, 0);
+                    bugs[i].Velocity = new Vector2(40, 0);
                 }
-                if (brbugs[i].Location.X > 900)
+                else if (bugs[i].Location.X > 900)
                 {
-                    brbugs[i].Velocity = new Vector2(-40, 0);
+                    bugs[i].Velocity = new Vector2(-40, 0);
                 }
 
-                if (ms.LeftButton == ButtonState.Pressed && Cursor.IsBoxColliding(brbugs[i].BoundingBoxRect))
+             
+                if (velocity.Y >= 20 && velocity.Y <= 24)
                 {
+                    bugs[i].Rotation = bugs[i].Rotation + 0.2f;
 
-                }
-
-                brbugs[i].Velocity = new Vector2(rand.Next(75, 130), 21);
-
-                if (brbugs[i].Velocity.Y >= 20 && brbugs[i].Velocity.Y <= 24)
-                {
-                    brbugs[i].Rotation = brbugs[i].Rotation + 0.2f;
-                    if (brbugs[i].Rotation >= 0.6f)
+                    if (bugs[i].Rotation >= 0.6f)
                     {
-                        brbugs[i].Rotation -= 0.2f;
+                        bugs[i].Rotation = bugs[i].Rotation - 0.2f;
                     }
                 }
+
+
+                if (ms.LeftButton == ButtonState.Pressed && Cursor.IsBoxColliding(bugs[i].BoundingBoxRect))
+                {
+                    bugs.RemoveAt(i);
+                }
+                
             }
 
             // TODO: Add your update logic here
@@ -148,10 +151,12 @@ namespace BugSmasher
             spriteBatch.Begin();
 
             spriteBatch.Draw(background, Vector2.Zero, Color.White);
-            for (int c = 0; c < brbugs.Count; c++)
+
+            for (int c = 0; c < bugs.Count; c++)
             {
-                brbugs[c].Draw(spriteBatch);
-            }           
+                bugs[c].Draw(spriteBatch);
+            }    
+       
             Cursor.Draw(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);

@@ -8,7 +8,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\eahscs\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\bin\x86\Debug\Content\background.xnb</Output>
-      <Time>2014-11-03T07:53:06.0574-05:00</Time>
+      <Time>2014-11-04T08:03:55.9254-05:00</Time>
     </Item>
     <Item>
       <Source>spritesheet.png</Source>
@@ -17,7 +17,7 @@
       <Processor>TextureProcessor</Processor>
       <Options>None</Options>
       <Output>C:\Users\eahscs\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\bin\x86\Debug\Content\spritesheet.xnb</Output>
-      <Time>2014-11-03T07:53:06.1114-05:00</Time>
+      <Time>2014-11-04T08:03:55.9334-05:00</Time>
     </Item>
     <BuildSuccessful>true</BuildSuccessful>
     <Settings>
@@ -25,10 +25,10 @@
       <TargetProfile>HiDef</TargetProfile>
       <BuildConfiguration>Debug</BuildConfiguration>
       <CompressContent>false</CompressContent>
-      <RootDirectory>C:\Users\eahscs\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasherContent\</RootDirectory>
-      <LoggerRootDirectory>C:\Users\eahscs\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\</LoggerRootDirectory>
-      <IntermediateDirectory>C:\Users\eahscs\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasherContent\obj\x86\Debug\</IntermediateDirectory>
-      <OutputDirectory>C:\Users\eahscs\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\bin\x86\Debug\Content\</OutputDirectory>
+      <RootDirectory>C:\Users\EAHSCS\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasherContent\</RootDirectory>
+      <LoggerRootDirectory>C:\Users\EAHSCS\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\</LoggerRootDirectory>
+      <IntermediateDirectory>C:\Users\EAHSCS\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasherContent\obj\x86\Debug\</IntermediateDirectory>
+      <OutputDirectory>C:\Users\EAHSCS\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\bin\x86\Debug\Content\</OutputDirectory>
     </Settings>
     <Assemblies>
       <Assembly>
