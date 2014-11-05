@@ -23,7 +23,7 @@ namespace BugSmasher
         Random rand = new Random();
         float bloopTime = 1.0f;
         float remainTime = 0.0f;
-        List<Sprite> bugs = new List<Sprite>();
+        List<Bug> bugs = new List<Bug>();
         Sprite Cursor;
 
 
@@ -61,7 +61,8 @@ namespace BugSmasher
             // TODO: use this.Content to load your game content here
             
             Cursor = new Sprite(new Vector2(40, 40), spriteSheet, new Rectangle(137, 198, 44, 53), Vector2.Zero);
-            Spawnbug1(new Vector2(rand.Next(0, 18), rand.Next(0, 450)), Vector2.Zero);
+            Spawnbug1(new Vector2(rand.Next(0, 18), rand.Next(0, 450)), new Vector2(80, 0));
+
         }
 
         /// <summary>
@@ -75,7 +76,8 @@ namespace BugSmasher
 
         public void Spawnbug1(Vector2 location, Vector2 velocity)
         {
-            Sprite brbug = new Sprite(location, spriteSheet, new Rectangle(6, 15, 53, 32), velocity);
+            Bug brbug = new Bug(location, spriteSheet, new Rectangle(6, 15, 53, 32), velocity);
+            //brbug.state = BugStates.Stopped;
 
             bugs.Add(brbug);
         }
@@ -97,37 +99,23 @@ namespace BugSmasher
             Cursor.Location = new Vector2(ms.X - 10, ms.Y - 15);
             Cursor.Velocity = new Vector2(ms.X, ms.Y);
 
-            Vector2 location = new Vector2(rand.Next(0, 18), rand.Next(0, 450));
+            //Vector2 location = new Vector2(rand.Next(0, 18), rand.Next(0, 450));
+
+            
             Vector2 velocity = new Vector2(rand.Next(-130, 130), rand.Next(-25, 25));
+
+            
 
             for (int i = bugs.Count - 1; i >= 0; i--)
             {
                 bugs[i].Update(gameTime);
 
+                velocity = new Vector2(rand.Next(100, 500), rand.Next(80, 450)) - bugs[i].Location;
+                velocity.Normalize();
+                velocity *= 40;
+
                 bugs[i].FlipHorizontal = false;
-
-                
-
-                if (bugs[i].Location.X <= 0)
-                {
-                    bugs[i].Velocity = new Vector2(40, 0);
-                }
-                else if (bugs[i].Location.X > 900)
-                {
-                    bugs[i].Velocity = new Vector2(-40, 0);
-                }
-
-             
-                if (velocity.Y >= 20 && velocity.Y <= 24)
-                {
-                    bugs[i].Rotation = bugs[i].Rotation + 0.2f;
-
-                    if (bugs[i].Rotation >= 0.6f)
-                    {
-                        bugs[i].Rotation = bugs[i].Rotation - 0.2f;
-                    }
-                }
-
+                bugs[i].Velocity = velocity;
 
                 if (ms.LeftButton == ButtonState.Pressed && Cursor.IsBoxColliding(bugs[i].BoundingBoxRect))
                 {

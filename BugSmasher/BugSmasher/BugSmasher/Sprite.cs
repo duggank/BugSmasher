@@ -52,6 +52,8 @@ namespace BugSmasher
 
         }
 
+
+
         public bool FlipHorizontal { get; set; }
 
         public Vector2 Location
