@@ -61,7 +61,7 @@ namespace BugSmasher
             // TODO: use this.Content to load your game content here
             
             Cursor = new Sprite(new Vector2(40, 40), spriteSheet, new Rectangle(137, 198, 44, 53), Vector2.Zero);
-            Spawnbug1(new Vector2(rand.Next(0, 18), rand.Next(0, 450)), new Vector2(80, 0));
+            Spawnbug1(new Vector2(rand.Next(0, 18), rand.Next(120, 200)), new Vector2(80, 0));
 
         }
 
@@ -77,8 +77,9 @@ namespace BugSmasher
         public void Spawnbug1(Vector2 location, Vector2 velocity)
         {
             Bug brbug = new Bug(location, spriteSheet, new Rectangle(6, 15, 53, 32), velocity);
+            Bug spbug = new Bug(new Vector2(rand.Next(0, 5), rand.Next(30, 100)), spriteSheet, new Rectangle(72, 9, 52, 41), velocity);
             //brbug.state = BugStates.Stopped;
-
+            bugs.Add(spbug);
             bugs.Add(brbug);
         }
 
@@ -110,12 +111,7 @@ namespace BugSmasher
             {
                 bugs[i].Update(gameTime);
 
-                velocity = new Vector2(rand.Next(100, 500), rand.Next(80, 450)) - bugs[i].Location;
-                velocity.Normalize();
-                velocity *= 40;
 
-                bugs[i].FlipHorizontal = false;
-                bugs[i].Velocity = velocity;
 
                 if (ms.LeftButton == ButtonState.Pressed && Cursor.IsBoxColliding(bugs[i].BoundingBoxRect))
                 {

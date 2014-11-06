@@ -16,7 +16,11 @@ namespace BugSmasher
     class Bug : Sprite
     {
         public BugStates State;
-        public Sprite target;
+
+        private Random rand = new Random((int)DateTime.UtcNow.Ticks);
+
+        private float moveTimer = 0;
+        private float moveTimerMax = 280f;
 
         public Bug(
            Vector2 location,
@@ -25,14 +29,24 @@ namespace BugSmasher
            Vector2 velocity) : base (location, texture, initialFrame, velocity)
         {
             State = BugStates.Crawling;
-
+            System.Threading.Thread.Sleep(1);
         }
 
         public override void Update(GameTime gameTime)
         {
-            if (target != null)
+            moveTimer += (float)gameTime.ElapsedGameTime.Milliseconds;
+
+            if (moveTimer > moveTimerMax)
             {
-                
+                moveTimer = 0;
+
+                velocity = new Vector2(Center.X + 200, Center.Y + rand.Next(-165, 170)) - Location;
+                velocity.Normalize();
+                velocity *= 40;
+                Rotation = (float)Math.Atan2(velocity.Y, velocity.X);
+
+                FlipHorizontal = false;
+                Velocity = velocity;
             }
 
             base.Update(gameTime);
