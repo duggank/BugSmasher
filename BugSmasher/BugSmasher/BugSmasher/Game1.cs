@@ -21,15 +21,15 @@ namespace BugSmasher
         Texture2D background;
         Texture2D spriteSheet;
         Random rand = new Random();
-        float bloopTime = 1.0f;
-        float remainTime = 0.0f;
         List<Bug> bugs = new List<Bug>();
         Sprite Cursor;
+        Sprite Bar;
 
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
+            graphics.IsFullScreen = true;
             Content.RootDirectory = "Content";
         }
 
@@ -61,7 +61,18 @@ namespace BugSmasher
             // TODO: use this.Content to load your game content here
             
             Cursor = new Sprite(new Vector2(40, 40), spriteSheet, new Rectangle(137, 198, 44, 53), Vector2.Zero);
-            Spawnbug1(new Vector2(rand.Next(0, 18), rand.Next(120, 200)), new Vector2(80, 0));
+            Bar = new Sprite(new Vector2(180, 0), spriteSheet, new Rectangle(2, 300, 462, 82), Vector2.Zero);
+
+            Spawnbug1(new Vector2(rand.Next(0, 18), rand.Next(0, 10)), new Vector2(80, 0));
+            Spawnbug1(new Vector2(rand.Next(0, 18), rand.Next(30, 40)), new Vector2(80, 0));
+
+            for (int col = 0; col < 10; col++)
+            {
+                for (int row = 0; row < 5; row++)
+                {
+                    Spawnbug1(new Vector2(-400 + 64 * col + rand.Next(-32, 32), 20 + row * 128 + rand.Next(-64, 64)), new Vector2(80, 0));
+                }
+            }
 
         }
 
@@ -76,11 +87,17 @@ namespace BugSmasher
 
         public void Spawnbug1(Vector2 location, Vector2 velocity)
         {
-            Bug brbug = new Bug(location, spriteSheet, new Rectangle(6, 15, 53, 32), velocity);
-            Bug spbug = new Bug(new Vector2(rand.Next(0, 5), rand.Next(30, 100)), spriteSheet, new Rectangle(72, 9, 52, 41), velocity);
+            Rectangle rect = new Rectangle(rand.Next(0, 3) * 64, rand.Next(0, 2) * 64, 64, 64);
+
+            Bug brbug = new Bug(location, spriteSheet, rect, velocity);
             //brbug.state = BugStates.Stopped;
-            bugs.Add(spbug);
             bugs.Add(brbug);
+        }
+        public void Spawnbug2(Vector2 location, Vector2 velocity) 
+        {
+            
+            Bug spbug = new Bug(new Vector2(rand.Next(0, 5), rand.Next(30, 100)), spriteSheet, new Rectangle(72, 9, 52, 41), velocity);
+            bugs.Add(spbug);
         }
 
         /// <summary>
@@ -95,6 +112,8 @@ namespace BugSmasher
             // Allows the game to exit
             if (CurrentKeyboardState.IsKeyDown(Keys.Escape))
                 this.Exit();
+
+            Bar.Update(gameTime);
 
             Cursor.Update(gameTime);
             Cursor.Location = new Vector2(ms.X - 10, ms.Y - 15);
@@ -115,7 +134,8 @@ namespace BugSmasher
 
                 if (ms.LeftButton == ButtonState.Pressed && Cursor.IsBoxColliding(bugs[i].BoundingBoxRect))
                 {
-                    bugs.RemoveAt(i);
+                    //bugs.RemoveAt(i);
+                    bugs[i].Splat();
                 }
                 
             }
@@ -138,9 +158,18 @@ namespace BugSmasher
 
             for (int c = 0; c < bugs.Count; c++)
             {
-                bugs[c].Draw(spriteBatch);
-            }    
-       
+                if (bugs[c].Dead)
+                    bugs[c].Draw(spriteBatch);
+            }
+
+            for (int c = 0; c < bugs.Count; c++)
+            {
+                if (!bugs[c].Dead)
+                    bugs[c].Draw(spriteBatch);
+            }
+
+
+            Bar.Draw(spriteBatch);
             Cursor.Draw(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);

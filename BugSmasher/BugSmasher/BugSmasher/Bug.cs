@@ -16,11 +16,14 @@ namespace BugSmasher
     class Bug : Sprite
     {
         public BugStates State;
+        public bool Dead = false;
 
         private Random rand = new Random((int)DateTime.UtcNow.Ticks);
 
         private float moveTimer = 0;
-        private float moveTimerMax = 280f;
+        private float moveTimerMax = 180f;
+        private float deadTimer = 0;
+        private float deadTimerMax = 3500f;
 
         public Bug(
            Vector2 location,
@@ -32,21 +35,35 @@ namespace BugSmasher
             System.Threading.Thread.Sleep(1);
         }
 
+        public void Splat()
+        {
+            this.frames[0] = new Rectangle(0, 128, 128, 128);
+            this.Velocity = Vector2.Zero;
+            this.Dead = true;
+            this.Fade = true;
+        }
+
         public override void Update(GameTime gameTime)
         {
             moveTimer += (float)gameTime.ElapsedGameTime.Milliseconds;
 
-            if (moveTimer > moveTimerMax)
+            if (Dead)
+                deadTimer += (float)gameTime.ElapsedGameTime.Milliseconds;
+
+            if (!Dead)
             {
-                moveTimer = 0;
+                if (moveTimer > moveTimerMax)
+                {
+                    moveTimer = 0;
 
-                velocity = new Vector2(Center.X + 200, Center.Y + rand.Next(-165, 170)) - Location;
-                velocity.Normalize();
-                velocity *= 40;
-                Rotation = (float)Math.Atan2(velocity.Y, velocity.X);
+                    velocity = new Vector2(Center.X + 200, Center.Y + rand.Next(-165, 170)) - Location;
+                    velocity.Normalize();
+                    velocity *= 40;
+                    Rotation = (float)Math.Atan2(velocity.Y, velocity.X);
 
-                FlipHorizontal = false;
-                Velocity = velocity;
+                    FlipHorizontal = false;
+                    Velocity = velocity;
+                }
             }
 
             base.Update(gameTime);
@@ -54,7 +71,10 @@ namespace BugSmasher
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            base.Draw(spriteBatch);
+            if (deadTimer < deadTimerMax)
+            {
+                base.Draw(spriteBatch);
+            }
         }
     }
 }

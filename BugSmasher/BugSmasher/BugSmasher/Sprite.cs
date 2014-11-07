@@ -10,6 +10,7 @@ namespace BugSmasher
     class Sprite
     {
         public Texture2D Texture;
+        public bool Fade { get; set; }
 
         protected List<Rectangle> frames = new List<Rectangle>();
         private int frameWidth = 0;
@@ -49,6 +50,7 @@ namespace BugSmasher
             this.origin = new Vector2(frameWidth / 2, frameHeight / 2);
 
             tag = null;
+            this.Fade = false;
 
         }
 
@@ -167,6 +169,10 @@ namespace BugSmasher
 
             if (timeForCurrentFrame >= FrameTime)
             {
+                if (this.Fade)
+                {
+                    tintColor *= .92f;
+                }
                 currentFrame = (currentFrame + 1) % (frames.Count);
                 timeForCurrentFrame = 0.0f;
             }
