@@ -10,7 +10,8 @@ namespace BugSmasher
     enum BugStates
     {
         Crawling,
-        Stopped
+        Stopped,
+        Waiting
     }
 
     class Bug : Sprite
@@ -63,6 +64,14 @@ namespace BugSmasher
 
                     FlipHorizontal = false;
                     Velocity = velocity;
+                }
+
+                this.TintColor = Color.White;
+
+                if (this.State == BugStates.Waiting)
+                {
+                    this.velocity /= 4;
+                    this.TintColor = Color.Red;
                 }
             }
 

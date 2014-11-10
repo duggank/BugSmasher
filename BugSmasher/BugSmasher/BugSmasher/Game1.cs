@@ -24,13 +24,20 @@ namespace BugSmasher
         List<Bug> bugs = new List<Bug>();
         Sprite Cursor;
         Sprite Bar;
+        Sprite Progress;
+
+        int Score = 0;
+
+        int userClicked = 0;
+        Vector2 userClickLocation = Vector2.Zero;
 
 
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
-            graphics.IsFullScreen = true;
+            graphics.IsFullScreen = false;
             Content.RootDirectory = "Content";
+            Window.Title = "Score: ";
         }
 
         /// <summary>
@@ -42,7 +49,7 @@ namespace BugSmasher
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            this.IsMouseVisible = false;
+            this.IsMouseVisible = true;
 
             base.Initialize();
         }
@@ -62,15 +69,17 @@ namespace BugSmasher
             
             Cursor = new Sprite(new Vector2(40, 40), spriteSheet, new Rectangle(137, 198, 44, 53), Vector2.Zero);
             Bar = new Sprite(new Vector2(180, 0), spriteSheet, new Rectangle(2, 300, 462, 82), Vector2.Zero);
+            Progress = new Sprite(new Vector2(210, 22), spriteSheet, new Rectangle(1, 384, 27, 41), Vector2.Zero);
+            ScoreUpdate();
 
             Spawnbug1(new Vector2(rand.Next(0, 18), rand.Next(0, 10)), new Vector2(80, 0));
             Spawnbug1(new Vector2(rand.Next(0, 18), rand.Next(30, 40)), new Vector2(80, 0));
 
             for (int col = 0; col < 10; col++)
             {
-                for (int row = 0; row < 5; row++)
+                for (int row = 0; row < 4; row++)
                 {
-                    Spawnbug1(new Vector2(-400 + 64 * col + rand.Next(-32, 32), 20 + row * 128 + rand.Next(-64, 64)), new Vector2(80, 0));
+                    Spawnbug1(new Vector2(-400 + 64 * col + rand.Next(-32, 32), 140 + row * 90 + rand.Next(-64, 64)), new Vector2(80, 0));
                 }
             }
 
@@ -83,6 +92,11 @@ namespace BugSmasher
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
+        }
+
+        public void ScoreUpdate() 
+        {
+            Window.Title = "Score: " + Score;
         }
 
         public void Spawnbug1(Vector2 location, Vector2 velocity)
@@ -114,6 +128,7 @@ namespace BugSmasher
                 this.Exit();
 
             Bar.Update(gameTime);
+            Progress.Update(gameTime);
 
             Cursor.Update(gameTime);
             Cursor.Location = new Vector2(ms.X - 10, ms.Y - 15);
@@ -124,18 +139,45 @@ namespace BugSmasher
             
             Vector2 velocity = new Vector2(rand.Next(-130, 130), rand.Next(-25, 25));
 
-            
+            if (ms.LeftButton == ButtonState.Pressed && userClicked == 0)
+            {
+                userClicked = 1;
+                userClickLocation = new Vector2(ms.X, ms.Y);
+            }
+
+            if (ms.LeftButton == ButtonState.Released)
+                userClicked = 0;
 
             for (int i = bugs.Count - 1; i >= 0; i--)
             {
                 bugs[i].Update(gameTime);
 
+                float clickDist = Vector2.Distance(userClickLocation, bugs[i].Center);
 
-
-                if (ms.LeftButton == ButtonState.Pressed && Cursor.IsBoxColliding(bugs[i].BoundingBoxRect))
+                if (userClicked == 1 && !bugs[i].Dead && clickDist < 50)
                 {
                     //bugs.RemoveAt(i);
+                    Score += 1;
+                    ScoreUpdate();
                     bugs[i].Splat();
+
+                    userClicked = 2;
+                }
+
+
+                bugs[i].State = BugStates.Crawling;
+
+                for (int j = 0; j < bugs.Count; j++)
+                {
+                    if (i == j || bugs[i].Dead || bugs[j].Dead)
+                        continue;
+
+                    float dist = Vector2.Distance(bugs[i].Center, bugs[j].Center);
+
+                    if (dist < 50 && bugs[i].Center.X < bugs[j].Center.X)
+                    {
+                        bugs[i].State = BugStates.Waiting;
+                    }
                 }
                 
             }
@@ -168,8 +210,9 @@ namespace BugSmasher
                     bugs[c].Draw(spriteBatch);
             }
 
-
+            Bar.TintColor = new Color(1, 1, 1, 0.6f);
             Bar.Draw(spriteBatch);
+            Progress.Draw(spriteBatch);
             Cursor.Draw(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
