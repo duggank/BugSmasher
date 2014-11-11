@@ -26,11 +26,14 @@ namespace BugSmasher
         Sprite Bar;
         Sprite Progress;
         Sprite Progress2;
+        bool Cool = false;
 
         float ptime = 0.0f;
-        float maxptime = 20.0f;
+        float maxptime = 15.0f * 1000f;
 
         int Score = 0;
+        int barWidth = 0;
+        int barWidthMax = 365;
 
         int userClicked = 0;
         Vector2 userClickLocation = Vector2.Zero;
@@ -53,7 +56,7 @@ namespace BugSmasher
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            this.IsMouseVisible = true;
+            this.IsMouseVisible = false;
 
             base.Initialize();
         }
@@ -102,6 +105,12 @@ namespace BugSmasher
         public void ScoreUpdate() 
         {
             Window.Title = "Score: " + Score;
+            if (Cool && (Score >= 25 && Score < 30))
+                Window.Title = "Score: " + Score + "    You did okay...";
+            if (Cool && (Score >= 30))
+                Window.Title = "Score: " + Score + "    YOU DID AWESOME!!! :D";
+            if(!Cool && (Score >= 30))
+                Window.Title = "Score: " + Score + "    YOU DID AWESOME!!! :D";
         }
 
         public void Spawnbug1(Vector2 location, Vector2 velocity)
@@ -126,8 +135,19 @@ namespace BugSmasher
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
-            ptime += (float)gameTime.ElapsedGameTime.Seconds;
-                Progress2.Update(gameTime);
+            ptime += (float)gameTime.ElapsedGameTime.Milliseconds;
+            barWidth = (int)((ptime / maxptime) * 300);
+
+            if (barWidth > barWidthMax)
+            {
+                barWidth = barWidthMax;
+                Cool = true;
+            }
+            if (barWidth == barWidthMax && (Score >= 25 && Score < 30))
+                ScoreUpdate();
+
+            if (barWidth == barWidthMax && (Score >= 30))
+                ScoreUpdate();
 
             KeyboardState CurrentKeyboardState = Keyboard.GetState();
             MouseState ms = Mouse.GetState();
@@ -139,7 +159,7 @@ namespace BugSmasher
             Progress.Update(gameTime);
 
             Cursor.Update(gameTime);
-            Cursor.Location = new Vector2(ms.X - 10, ms.Y - 15);
+            Cursor.Location = new Vector2(ms.X - 16, ms.Y - 15);
             Cursor.Velocity = new Vector2(ms.X, ms.Y);
 
             //Vector2 location = new Vector2(rand.Next(0, 18), rand.Next(0, 450));
@@ -221,8 +241,14 @@ namespace BugSmasher
             Bar.TintColor = new Color(1, 1, 1, 0.6f);
             Bar.Draw(spriteBatch);
             Progress.Draw(spriteBatch);
-            Progress2.Draw(spriteBatch);
             Cursor.Draw(spriteBatch);
+            spriteBatch.End();
+
+            spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null);
+
+            spriteBatch.Draw(spriteSheet, new Rectangle(235, 22, barWidth, 39), new Rectangle(32, 384, 6, 39), Color.White);
+            spriteBatch.Draw(spriteSheet, new Rectangle(235 + barWidth, 22, 16, 39), new Rectangle(64, 384, 16, 39), Color.White);
+
             spriteBatch.End();
             base.Draw(gameTime);
         }
