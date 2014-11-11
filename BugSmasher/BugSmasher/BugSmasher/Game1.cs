@@ -25,6 +25,10 @@ namespace BugSmasher
         Sprite Cursor;
         Sprite Bar;
         Sprite Progress;
+        Sprite Progress2;
+
+        float ptime = 0.0f;
+        float maxptime = 20.0f;
 
         int Score = 0;
 
@@ -70,6 +74,7 @@ namespace BugSmasher
             Cursor = new Sprite(new Vector2(40, 40), spriteSheet, new Rectangle(137, 198, 44, 53), Vector2.Zero);
             Bar = new Sprite(new Vector2(180, 0), spriteSheet, new Rectangle(2, 300, 462, 82), Vector2.Zero);
             Progress = new Sprite(new Vector2(210, 22), spriteSheet, new Rectangle(1, 384, 27, 41), Vector2.Zero);
+            Progress2 = new Sprite(new Vector2(238, 22), spriteSheet, new Rectangle(31, 384, 10, 39), Vector2.Zero);
             ScoreUpdate();
 
             Spawnbug1(new Vector2(rand.Next(0, 18), rand.Next(0, 10)), new Vector2(80, 0));
@@ -121,6 +126,9 @@ namespace BugSmasher
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            ptime += (float)gameTime.ElapsedGameTime.Seconds;
+                Progress2.Update(gameTime);
+
             KeyboardState CurrentKeyboardState = Keyboard.GetState();
             MouseState ms = Mouse.GetState();
             // Allows the game to exit
@@ -213,6 +221,7 @@ namespace BugSmasher
             Bar.TintColor = new Color(1, 1, 1, 0.6f);
             Bar.Draw(spriteBatch);
             Progress.Draw(spriteBatch);
+            Progress2.Draw(spriteBatch);
             Cursor.Draw(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
