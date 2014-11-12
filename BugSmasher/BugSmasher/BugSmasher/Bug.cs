@@ -11,7 +11,9 @@ namespace BugSmasher
     {
         Crawling,
         Stopped,
-        Waiting
+        Waiting,
+        Done,
+        Clickable
     }
 
     class Bug : Sprite
@@ -32,7 +34,7 @@ namespace BugSmasher
            Rectangle initialFrame,
            Vector2 velocity) : base (location, texture, initialFrame, velocity)
         {
-            State = BugStates.Crawling;
+            State = BugStates.Crawling & BugStates.Clickable;
             System.Threading.Thread.Sleep(1);
         }
 
@@ -47,6 +49,12 @@ namespace BugSmasher
         public override void Update(GameTime gameTime)
         {
             moveTimer += (float)gameTime.ElapsedGameTime.Milliseconds;
+
+            if (State == BugStates.Done)
+            { 
+                if(
+            }
+
 
             if (Dead)
                 deadTimer += (float)gameTime.ElapsedGameTime.Milliseconds;

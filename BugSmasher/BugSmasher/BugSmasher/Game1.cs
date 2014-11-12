@@ -20,16 +20,19 @@ namespace BugSmasher
         SpriteBatch spriteBatch;
         Texture2D background;
         Texture2D spriteSheet;
+        Texture2D gameOver;
         Random rand = new Random();
         List<Bug> bugs = new List<Bug>();
         Sprite Cursor;
         Sprite Bar;
+        Sprite GO;
         Sprite Progress;
         Sprite Progress2;
         bool Cool = false;
+        bool GameOver = false;
 
         float ptime = 0.0f;
-        float maxptime = 15.0f * 1000f;
+        float maxptime = 8.25f * 1000f;
 
         int Score = 0;
         int barWidth = 0;
@@ -71,6 +74,7 @@ namespace BugSmasher
             spriteBatch = new SpriteBatch(GraphicsDevice);
             background = Content.Load<Texture2D>("background");
             spriteSheet = Content.Load<Texture2D>("spritesheet");
+            gameOver = Content.Load<Texture2D>("gameover");
 
             // TODO: use this.Content to load your game content here
             
@@ -78,12 +82,12 @@ namespace BugSmasher
             Bar = new Sprite(new Vector2(180, 0), spriteSheet, new Rectangle(2, 300, 462, 82), Vector2.Zero);
             Progress = new Sprite(new Vector2(210, 22), spriteSheet, new Rectangle(1, 384, 27, 41), Vector2.Zero);
             Progress2 = new Sprite(new Vector2(238, 22), spriteSheet, new Rectangle(31, 384, 10, 39), Vector2.Zero);
+            GO = new Sprite(new Vector2(238, 200), gameOver, new Rectangle(26, 3, 284, 269), Vector2.Zero);
             ScoreUpdate();
 
-            Spawnbug1(new Vector2(rand.Next(0, 18), rand.Next(0, 10)), new Vector2(80, 0));
-            Spawnbug1(new Vector2(rand.Next(0, 18), rand.Next(30, 40)), new Vector2(80, 0));
+            
 
-            for (int col = 0; col < 10; col++)
+            for (int col = 0; col < 15; col++)
             {
                 for (int row = 0; row < 4; row++)
                 {
@@ -128,6 +132,17 @@ namespace BugSmasher
             bugs.Add(spbug);
         }
 
+        public void GameOverTime()
+        {
+            if (GameOver)
+            {
+                for (int l = 0; l < bugs.Count; l++)
+                {
+                    bugs[l].State = BugStates.Done;
+                }
+            }
+        }
+
         /// <summary>
         /// Allows the game to run logic such as updating the world,
         /// checking for collisions, gathering input, and playing audio.
@@ -137,6 +152,12 @@ namespace BugSmasher
         {
             ptime += (float)gameTime.ElapsedGameTime.Milliseconds;
             barWidth = (int)((ptime / maxptime) * 300);
+
+                if (barWidth == barWidthMax && Score < 20)
+                {
+                    GameOver = true;
+                    GameOverTime();
+                }
 
             if (barWidth > barWidthMax)
             {
@@ -157,6 +178,7 @@ namespace BugSmasher
 
             Bar.Update(gameTime);
             Progress.Update(gameTime);
+            GO.Update(gameTime);
 
             Cursor.Update(gameTime);
             Cursor.Location = new Vector2(ms.X - 16, ms.Y - 15);
@@ -236,6 +258,14 @@ namespace BugSmasher
             {
                 if (!bugs[c].Dead)
                     bugs[c].Draw(spriteBatch);
+            }
+
+            for (int k = 0; k < 100; k++)
+            {
+                if (barWidth == barWidthMax && Score < 20)
+                {
+                    GO.Draw(spriteBatch);
+                }
             }
 
             Bar.TintColor = new Color(1, 1, 1, 0.6f);
