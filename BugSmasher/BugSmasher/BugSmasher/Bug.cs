@@ -20,6 +20,7 @@ namespace BugSmasher
     {
         public BugStates State;
         public bool Dead = false;
+        public static bool Done = false;
 
         private Random rand = new Random((int)DateTime.UtcNow.Ticks);
 
@@ -34,7 +35,7 @@ namespace BugSmasher
            Rectangle initialFrame,
            Vector2 velocity) : base (location, texture, initialFrame, velocity)
         {
-            State = BugStates.Crawling & BugStates.Clickable;
+            State = BugStates.Crawling;
             System.Threading.Thread.Sleep(1);
         }
 
@@ -50,10 +51,7 @@ namespace BugSmasher
         {
             moveTimer += (float)gameTime.ElapsedGameTime.Milliseconds;
 
-            if (State == BugStates.Done)
-            { 
-                if(
-            }
+            
 
 
             if (Dead)

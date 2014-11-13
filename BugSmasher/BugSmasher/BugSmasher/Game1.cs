@@ -23,6 +23,7 @@ namespace BugSmasher
         Texture2D gameOver;
         Random rand = new Random();
         List<Bug> bugs = new List<Bug>();
+        List<Bug> ladybugs = new List<Bug>();
         Sprite Cursor;
         Sprite Bar;
         Sprite GO;
@@ -48,6 +49,8 @@ namespace BugSmasher
             graphics.IsFullScreen = false;
             Content.RootDirectory = "Content";
             Window.Title = "Score: ";
+
+            //System.Diagnostics.Process.Start("http://www.StackOverflow.com");
         }
 
         /// <summary>
@@ -109,12 +112,11 @@ namespace BugSmasher
         public void ScoreUpdate() 
         {
             Window.Title = "Score: " + Score;
-            if (Cool && (Score >= 25 && Score < 30))
+            if (Cool && (Score >= 28 && Score < 40))
                 Window.Title = "Score: " + Score + "    You did okay...";
-            if (Cool && (Score >= 30))
+            if (Cool && (Score >= 40))
                 Window.Title = "Score: " + Score + "    YOU DID AWESOME!!! :D";
-            if(!Cool && (Score >= 30))
-                Window.Title = "Score: " + Score + "    YOU DID AWESOME!!! :D";
+            
         }
 
         public void Spawnbug1(Vector2 location, Vector2 velocity)
@@ -125,11 +127,12 @@ namespace BugSmasher
             //brbug.state = BugStates.Stopped;
             bugs.Add(brbug);
         }
-        public void Spawnbug2(Vector2 location, Vector2 velocity) 
+
+        public void SpawnLBugs(Vector2 location, Vector2 velocity)
         {
-            
-            Bug spbug = new Bug(new Vector2(rand.Next(0, 5), rand.Next(30, 100)), spriteSheet, new Rectangle(72, 9, 52, 41), velocity);
-            bugs.Add(spbug);
+            Bug ladybug = new Bug(location, spriteSheet, new Rectangle(137, 141, 47, 38), velocity);
+
+            ladybugs.Add(ladybug);
         }
 
         public void GameOverTime()
@@ -153,7 +156,7 @@ namespace BugSmasher
             ptime += (float)gameTime.ElapsedGameTime.Milliseconds;
             barWidth = (int)((ptime / maxptime) * 300);
 
-                if (barWidth == barWidthMax && Score < 20)
+                if (barWidth == barWidthMax && Score < 28)
                 {
                     GameOver = true;
                     GameOverTime();
@@ -164,18 +167,23 @@ namespace BugSmasher
                 barWidth = barWidthMax;
                 Cool = true;
             }
-            if (barWidth == barWidthMax && (Score >= 25 && Score < 30))
+
+            if (barWidth == barWidthMax && (Score < 40 && Score >= 28))
                 ScoreUpdate();
 
-            if (barWidth == barWidthMax && (Score >= 30))
+            if (barWidth == barWidthMax && (Score >= 40))
                 ScoreUpdate();
+
+
+
+            
 
             KeyboardState CurrentKeyboardState = Keyboard.GetState();
             MouseState ms = Mouse.GetState();
             // Allows the game to exit
             if (CurrentKeyboardState.IsKeyDown(Keys.Escape))
                 this.Exit();
-
+            
             Bar.Update(gameTime);
             Progress.Update(gameTime);
             GO.Update(gameTime);
@@ -188,7 +196,7 @@ namespace BugSmasher
 
             
             Vector2 velocity = new Vector2(rand.Next(-130, 130), rand.Next(-25, 25));
-
+    
             if (ms.LeftButton == ButtonState.Pressed && userClicked == 0)
             {
                 userClicked = 1;
@@ -204,16 +212,17 @@ namespace BugSmasher
 
                 float clickDist = Vector2.Distance(userClickLocation, bugs[i].Center);
 
-                if (userClicked == 1 && !bugs[i].Dead && clickDist < 50)
-                {
-                    //bugs.RemoveAt(i);
-                    Score += 1;
-                    ScoreUpdate();
-                    bugs[i].Splat();
+                
+                    if (userClicked == 1 && !bugs[i].Dead && clickDist < 50 && !GameOver && !Cool)
+                    {
+                        //bugs.RemoveAt(i);
+                        Score += 1;
+                        ScoreUpdate();
+                        bugs[i].Splat();
 
-                    userClicked = 2;
-                }
-
+                        userClicked = 2;
+                    }
+                
 
                 bugs[i].State = BugStates.Crawling;
 
@@ -262,7 +271,7 @@ namespace BugSmasher
 
             for (int k = 0; k < 100; k++)
             {
-                if (barWidth == barWidthMax && Score < 20)
+                if (barWidth == barWidthMax && Score < 28)
                 {
                     GO.Draw(spriteBatch);
                 }
@@ -273,13 +282,14 @@ namespace BugSmasher
             Progress.Draw(spriteBatch);
             Cursor.Draw(spriteBatch);
             spriteBatch.End();
-
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null);
 
             spriteBatch.Draw(spriteSheet, new Rectangle(235, 22, barWidth, 39), new Rectangle(32, 384, 6, 39), Color.White);
             spriteBatch.Draw(spriteSheet, new Rectangle(235 + barWidth, 22, 16, 39), new Rectangle(64, 384, 16, 39), Color.White);
+            
 
             spriteBatch.End();
+            
             base.Draw(gameTime);
         }
     }
