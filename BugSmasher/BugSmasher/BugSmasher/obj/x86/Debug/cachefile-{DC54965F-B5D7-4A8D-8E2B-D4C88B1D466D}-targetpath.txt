@@ -1,3 +1,5 @@
 Content\background.xnb
 Content\spritesheet.xnb
 Content\gameover.xnb
+Content\Gun.xnb
+Content\Fire.xnb

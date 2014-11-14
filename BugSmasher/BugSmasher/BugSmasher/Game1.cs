@@ -21,16 +21,22 @@ namespace BugSmasher
         Texture2D background;
         Texture2D spriteSheet;
         Texture2D gameOver;
+        Texture2D Fire;
+        Texture2D gunnygoo;
         Random rand = new Random();
         List<Bug> bugs = new List<Bug>();
-        List<Bug> ladybugs = new List<Bug>();
         Sprite Cursor;
         Sprite Bar;
         Sprite GO;
         Sprite Progress;
         Sprite Progress2;
+        Sprite Flame;
+        Sprite Thrower;
+        bool Shoot = false;
         bool Cool = false;
         bool GameOver = false;
+        bool Hand = true;
+        bool Gun = false;
 
         float ptime = 0.0f;
         float maxptime = 8.25f * 1000f;
@@ -78,6 +84,8 @@ namespace BugSmasher
             background = Content.Load<Texture2D>("background");
             spriteSheet = Content.Load<Texture2D>("spritesheet");
             gameOver = Content.Load<Texture2D>("gameover");
+            Fire = Content.Load<Texture2D>("Fire");
+            gunnygoo = Content.Load<Texture2D>("Gun");
 
             // TODO: use this.Content to load your game content here
             
@@ -86,6 +94,8 @@ namespace BugSmasher
             Progress = new Sprite(new Vector2(210, 22), spriteSheet, new Rectangle(1, 384, 27, 41), Vector2.Zero);
             Progress2 = new Sprite(new Vector2(238, 22), spriteSheet, new Rectangle(31, 384, 10, 39), Vector2.Zero);
             GO = new Sprite(new Vector2(238, 200), gameOver, new Rectangle(26, 3, 284, 269), Vector2.Zero);
+            Flame = new Sprite(new Vector2(200, 200), Fire, new Rectangle(230, 54, 132, 75), Vector2.Zero);
+            Thrower = new Sprite(new Vector2(200, 200), gunnygoo, new Rectangle(144, 65, 77, 53), Vector2.Zero);
             ScoreUpdate();
 
             
@@ -128,13 +138,6 @@ namespace BugSmasher
             bugs.Add(brbug);
         }
 
-        public void SpawnLBugs(Vector2 location, Vector2 velocity)
-        {
-            Bug ladybug = new Bug(location, spriteSheet, new Rectangle(137, 141, 47, 38), velocity);
-
-            ladybugs.Add(ladybug);
-        }
-
         public void GameOverTime()
         {
             if (GameOver)
@@ -155,7 +158,7 @@ namespace BugSmasher
         {
             ptime += (float)gameTime.ElapsedGameTime.Milliseconds;
             barWidth = (int)((ptime / maxptime) * 300);
-
+            
                 if (barWidth == barWidthMax && Score < 28)
                 {
                     GameOver = true;
@@ -179,32 +182,57 @@ namespace BugSmasher
             
 
             KeyboardState CurrentKeyboardState = Keyboard.GetState();
+            if(CurrentKeyboardState.IsKeyDown(Keys.D2))
+            {
+                Hand = false;
+                Gun = true;
+            }
+            else if (CurrentKeyboardState.IsKeyDown(Keys.D1))
+            {
+                Hand = true;
+                Gun = false;
+            }
+
             MouseState ms = Mouse.GetState();
             // Allows the game to exit
             if (CurrentKeyboardState.IsKeyDown(Keys.Escape))
                 this.Exit();
-            
+            Flame.Update(gameTime);
+            Thrower.Update(gameTime);
             Bar.Update(gameTime);
             Progress.Update(gameTime);
             GO.Update(gameTime);
 
             Cursor.Update(gameTime);
-            Cursor.Location = new Vector2(ms.X - 16, ms.Y - 15);
+            Cursor.Location = new Vector2(ms.X - 16, ms.Y - 15);           
             Cursor.Velocity = new Vector2(ms.X, ms.Y);
+            Thrower.Location = new Vector2(ms.X - 10, ms.Y - 10);
+            Thrower.Velocity = new Vector2(ms.X, ms.Y);
+            Flame.Location = new Vector2(ms.X - 120, ms.Y - 30);
+            Flame.Velocity = new Vector2(ms.X, ms.Y);
 
             //Vector2 location = new Vector2(rand.Next(0, 18), rand.Next(0, 450));
 
             
             Vector2 velocity = new Vector2(rand.Next(-130, 130), rand.Next(-25, 25));
     
-            if (ms.LeftButton == ButtonState.Pressed && userClicked == 0)
+            if (ms.LeftButton == ButtonState.Pressed && userClicked == 0 && Hand)
             {
                 userClicked = 1;
                 userClickLocation = new Vector2(ms.X, ms.Y);
             }
 
-            if (ms.LeftButton == ButtonState.Released)
+            if (ms.LeftButton == ButtonState.Released && Hand)
                 userClicked = 0;
+
+            else if(ms.LeftButton == ButtonState.Pressed && Gun)
+                 {
+                     Shoot = true;
+                 }
+            if (ms.LeftButton == ButtonState.Released && Gun)
+            {
+                Shoot = false;
+            }
 
             for (int i = bugs.Count - 1; i >= 0; i--)
             {
@@ -213,7 +241,7 @@ namespace BugSmasher
                 float clickDist = Vector2.Distance(userClickLocation, bugs[i].Center);
 
                 
-                    if (userClicked == 1 && !bugs[i].Dead && clickDist < 50 && !GameOver && !Cool)
+                    if (userClicked == 1 && !bugs[i].Dead && clickDist < 50 && !GameOver && !Cool && Hand)
                     {
                         //bugs.RemoveAt(i);
                         Score += 1;
@@ -221,6 +249,12 @@ namespace BugSmasher
                         bugs[i].Splat();
 
                         userClicked = 2;
+                    }
+                    if (ms.LeftButton == ButtonState.Pressed && Gun && Flame.IsBoxColliding(bugs[i].BoundingBoxRect) && !bugs[i].Dead)
+                    {
+                        Score += 1;
+                        ScoreUpdate();
+                        bugs[i].Splat();
                     }
                 
 
@@ -280,7 +314,17 @@ namespace BugSmasher
             Bar.TintColor = new Color(1, 1, 1, 0.6f);
             Bar.Draw(spriteBatch);
             Progress.Draw(spriteBatch);
-            Cursor.Draw(spriteBatch);
+            for (int k = 0; k < 100; k++)
+            {
+                if(Hand && !Gun)
+                   Cursor.Draw(spriteBatch);
+                if (!Hand && Gun)
+                {
+                    Thrower.Draw(spriteBatch);
+                    if (Shoot)
+                        Flame.Draw(spriteBatch);
+                }
+            }
             spriteBatch.End();
             spriteBatch.Begin(SpriteSortMode.FrontToBack, BlendState.AlphaBlend, SamplerState.PointClamp, null, null, null);
 
