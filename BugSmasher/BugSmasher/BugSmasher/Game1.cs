@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using System.Diagnostics;
 
 namespace BugSmasher
 {
@@ -25,6 +26,7 @@ namespace BugSmasher
         Texture2D gunnygoo;
         Random rand = new Random();
         List<Bug> bugs = new List<Bug>();
+        Bug ladybug;
         Sprite Cursor;
         Sprite Bar;
         Sprite GO;
@@ -37,6 +39,7 @@ namespace BugSmasher
         bool GameOver = false;
         bool Hand = true;
         bool Gun = false;
+        int Ammunition = 22;
 
         float ptime = 0.0f;
         float maxptime = 8.25f * 1000f;
@@ -54,7 +57,7 @@ namespace BugSmasher
             graphics = new GraphicsDeviceManager(this);
             graphics.IsFullScreen = false;
             Content.RootDirectory = "Content";
-            Window.Title = "Score: ";
+            Window.Title = "Score: " + " Ammo: " + Ammunition;
 
             //System.Diagnostics.Process.Start("http://www.StackOverflow.com");
         }
@@ -96,6 +99,7 @@ namespace BugSmasher
             GO = new Sprite(new Vector2(238, 200), gameOver, new Rectangle(26, 3, 284, 269), Vector2.Zero);
             Flame = new Sprite(new Vector2(200, 200), Fire, new Rectangle(230, 54, 132, 75), Vector2.Zero);
             Thrower = new Sprite(new Vector2(200, 200), gunnygoo, new Rectangle(144, 65, 77, 53), Vector2.Zero);
+            ladybug = new Bug(new Vector2(10, 250), spriteSheet, new Rectangle(137, 141, 45, 38), Vector2.Zero);
             ScoreUpdate();
 
             
@@ -121,11 +125,11 @@ namespace BugSmasher
 
         public void ScoreUpdate() 
         {
-            Window.Title = "Score: " + Score;
+            Window.Title = "Score: " + Score + " Ammo: " + Ammunition;
             if (Cool && (Score >= 28 && Score < 40))
-                Window.Title = "Score: " + Score + "    You did okay...";
+                Window.Title = "Score: " + Score + " Ammo: " + Ammunition + "    You did okay...";
             if (Cool && (Score >= 40))
-                Window.Title = "Score: " + Score + "    YOU DID AWESOME!!! :D";
+                Window.Title = "Score: " + Score + " Ammo: " + Ammunition + "    YOU DID AWESOME!!! :D";
             
         }
 
@@ -163,6 +167,7 @@ namespace BugSmasher
                 {
                     GameOver = true;
                     GameOverTime();
+                    Process.Start("http://www.staggeringbeauty.com");
                 }
 
             if (barWidth > barWidthMax)
@@ -178,6 +183,7 @@ namespace BugSmasher
                 ScoreUpdate();
 
 
+            
 
             
 
@@ -197,6 +203,8 @@ namespace BugSmasher
             // Allows the game to exit
             if (CurrentKeyboardState.IsKeyDown(Keys.Escape))
                 this.Exit();
+            ladybug.Velocity = new Vector2(120, 0);
+            ladybug.Update(gameTime);
             Flame.Update(gameTime);
             Thrower.Update(gameTime);
             Bar.Update(gameTime);
@@ -224,14 +232,20 @@ namespace BugSmasher
 
             if (ms.LeftButton == ButtonState.Released && Hand)
                 userClicked = 0;
-
+        
             else if(ms.LeftButton == ButtonState.Pressed && Gun)
                  {
                      Shoot = true;
+                     Ammunition -= 1;
                  }
             if (ms.LeftButton == ButtonState.Released && Gun)
             {
                 Shoot = false;
+            }
+
+            if (Ammunition <= 0)
+            {
+                Ammunition = 0;
             }
 
             for (int i = bugs.Count - 1; i >= 0; i--)
@@ -239,9 +253,10 @@ namespace BugSmasher
                 bugs[i].Update(gameTime);
 
                 float clickDist = Vector2.Distance(userClickLocation, bugs[i].Center);
+                float Distclick = Vector2.Distance(userClickLocation, ladybug.Center);
 
-                
-                    if (userClicked == 1 && !bugs[i].Dead && clickDist < 50 && !GameOver && !Cool && Hand)
+
+                if (userClicked == 1 && !bugs[i].Dead && clickDist < 50 && !GameOver && !Cool && Hand)
                     {
                         //bugs.RemoveAt(i);
                         Score += 1;
@@ -250,13 +265,29 @@ namespace BugSmasher
 
                         userClicked = 2;
                     }
-                    if (ms.LeftButton == ButtonState.Pressed && Gun && Flame.IsBoxColliding(bugs[i].BoundingBoxRect) && !bugs[i].Dead)
+                if (userClicked == 1 && !ladybug.Dead && Distclick < 50 && !GameOver && !Cool && Hand)
+                {
+                    Score -= 5;
+                    ScoreUpdate();
+                    ladybug.Splat();
+
+                    userClicked = 2;
+                }
+                    if (Ammunition > 0)
                     {
-                        Score += 1;
-                        ScoreUpdate();
-                        bugs[i].Splat();
+                        if (ms.LeftButton == ButtonState.Pressed && Gun && Flame.IsBoxColliding(bugs[i].BoundingBoxRect) && !bugs[i].Dead)
+                        {
+                            Score += 1;
+                            ScoreUpdate();
+                            bugs[i].Splat();
+                        }
+                        if (ms.LeftButton == ButtonState.Pressed && Gun && Flame.IsBoxColliding(ladybug.BoundingBoxRect) && !ladybug.Dead)
+                        {
+                            Score -= 5;
+                            ScoreUpdate();
+                            ladybug.Splat();
+                        }
                     }
-                
 
                 bugs[i].State = BugStates.Crawling;
 
@@ -290,7 +321,7 @@ namespace BugSmasher
             spriteBatch.Begin();
 
             spriteBatch.Draw(background, Vector2.Zero, Color.White);
-
+            
             for (int c = 0; c < bugs.Count; c++)
             {
                 if (bugs[c].Dead)
@@ -310,7 +341,7 @@ namespace BugSmasher
                     GO.Draw(spriteBatch);
                 }
             }
-
+            ladybug.Draw(spriteBatch);
             Bar.TintColor = new Color(1, 1, 1, 0.6f);
             Bar.Draw(spriteBatch);
             Progress.Draw(spriteBatch);
@@ -321,7 +352,7 @@ namespace BugSmasher
                 if (!Hand && Gun)
                 {
                     Thrower.Draw(spriteBatch);
-                    if (Shoot)
+                    if (Shoot && Ammunition > 0)
                         Flame.Draw(spriteBatch);
                 }
             }
