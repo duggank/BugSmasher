@@ -17,3 +17,4 @@ C:\Users\eahscs\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\obj
 C:\Users\EAHSCS\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\bin\x86\Debug\Content\gameover.xnb
 C:\Users\EAHSCS\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\bin\x86\Debug\Content\Gun.xnb
 C:\Users\EAHSCS\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\bin\x86\Debug\Content\Fire.xnb
+C:\Users\EAHSCS\Documents\GitHub\BugSmasher\BugSmasher\BugSmasher\BugSmasher\bin\x86\Debug\Content\photo.xnb

@@ -24,6 +24,7 @@ namespace BugSmasher
         Texture2D gameOver;
         Texture2D Fire;
         Texture2D gunnygoo;
+        Texture2D Face;
         Random rand = new Random();
         List<Bug> bugs = new List<Bug>();
         Bug ladybug;
@@ -39,7 +40,7 @@ namespace BugSmasher
         bool GameOver = false;
         bool Hand = true;
         bool Gun = false;
-        int Ammunition = 22;
+        int Ammunition = 65;
 
         float ptime = 0.0f;
         float maxptime = 8.25f * 1000f;
@@ -89,6 +90,7 @@ namespace BugSmasher
             gameOver = Content.Load<Texture2D>("gameover");
             Fire = Content.Load<Texture2D>("Fire");
             gunnygoo = Content.Load<Texture2D>("Gun");
+            Face = Content.Load<Texture2D>("photo");
 
             // TODO: use this.Content to load your game content here
             
@@ -99,7 +101,7 @@ namespace BugSmasher
             GO = new Sprite(new Vector2(238, 200), gameOver, new Rectangle(26, 3, 284, 269), Vector2.Zero);
             Flame = new Sprite(new Vector2(200, 200), Fire, new Rectangle(230, 54, 132, 75), Vector2.Zero);
             Thrower = new Sprite(new Vector2(200, 200), gunnygoo, new Rectangle(144, 65, 77, 53), Vector2.Zero);
-            ladybug = new Bug(new Vector2(10, 250), spriteSheet, new Rectangle(137, 141, 45, 38), Vector2.Zero);
+
             ScoreUpdate();
 
             
@@ -111,6 +113,11 @@ namespace BugSmasher
                     Spawnbug1(new Vector2(-400 + 64 * col + rand.Next(-32, 32), 140 + row * 90 + rand.Next(-64, 64)), new Vector2(80, 0));
                 }
             }
+
+            ladybug = new Bug(new Vector2(10, 250), spriteSheet, new Rectangle(137, 141, 45, 38), Vector2.Zero);
+            ladybug.Type = BugTypes.LadyBug;
+
+            bugs.Add(ladybug);
 
         }
 
@@ -167,7 +174,7 @@ namespace BugSmasher
                 {
                     GameOver = true;
                     GameOverTime();
-                    Process.Start("http://www.staggeringbeauty.com");
+                    //Process.Start("http://www.staggeringbeauty.com");
                 }
 
             if (barWidth > barWidthMax)
@@ -203,8 +210,7 @@ namespace BugSmasher
             // Allows the game to exit
             if (CurrentKeyboardState.IsKeyDown(Keys.Escape))
                 this.Exit();
-            ladybug.Velocity = new Vector2(120, 0);
-            ladybug.Update(gameTime);
+
             Flame.Update(gameTime);
             Thrower.Update(gameTime);
             Bar.Update(gameTime);
@@ -236,16 +242,22 @@ namespace BugSmasher
             else if(ms.LeftButton == ButtonState.Pressed && Gun)
                  {
                      Shoot = true;
-                     Ammunition -= 1;
                  }
             if (ms.LeftButton == ButtonState.Released && Gun)
             {
                 Shoot = false;
             }
 
+            if (Shoot)
+            {
+                Ammunition -= 1;
+                ScoreUpdate();
+            }
+
             if (Ammunition <= 0)
             {
                 Ammunition = 0;
+                ScoreUpdate();
             }
 
             for (int i = bugs.Count - 1; i >= 0; i--)
@@ -259,34 +271,37 @@ namespace BugSmasher
                 if (userClicked == 1 && !bugs[i].Dead && clickDist < 50 && !GameOver && !Cool && Hand)
                     {
                         //bugs.RemoveAt(i);
-                        Score += 1;
-                        ScoreUpdate();
-                        bugs[i].Splat();
+
+                        if (bugs[i].Type == BugTypes.LadyBug)
+                        {
+                            Score -= 5;
+                            ScoreUpdate();
+                        }
+                        else
+                            Score += 1;
+                            ScoreUpdate();
+                            bugs[i].Splat();
 
                         userClicked = 2;
                     }
-                if (userClicked == 1 && !ladybug.Dead && Distclick < 50 && !GameOver && !Cool && Hand)
-                {
-                    Score -= 5;
-                    ScoreUpdate();
-                    ladybug.Splat();
 
-                    userClicked = 2;
-                }
+
                     if (Ammunition > 0)
                     {
                         if (ms.LeftButton == ButtonState.Pressed && Gun && Flame.IsBoxColliding(bugs[i].BoundingBoxRect) && !bugs[i].Dead)
                         {
-                            Score += 1;
+                            if (bugs[i].Type == BugTypes.LadyBug)
+                            {
+                                Score -= 5;
+                                ScoreUpdate();
+                            }
+                            else
+                                Score += 1;
+
                             ScoreUpdate();
                             bugs[i].Splat();
                         }
-                        if (ms.LeftButton == ButtonState.Pressed && Gun && Flame.IsBoxColliding(ladybug.BoundingBoxRect) && !ladybug.Dead)
-                        {
-                            Score -= 5;
-                            ScoreUpdate();
-                            ladybug.Splat();
-                        }
+
                     }
 
                 bugs[i].State = BugStates.Crawling;
@@ -301,6 +316,10 @@ namespace BugSmasher
                     if (dist < 50 && bugs[i].Center.X < bugs[j].Center.X)
                     {
                         bugs[i].State = BugStates.Waiting;
+                    }
+                    if (dist < 50 && ladybug.Center.X < bugs[j].Center.X)
+                    {
+                        ladybug.State = BugStates.Waiting;
                     }
                 }
                 
@@ -320,7 +339,7 @@ namespace BugSmasher
             GraphicsDevice.Clear(Color.CornflowerBlue);
             spriteBatch.Begin();
 
-            spriteBatch.Draw(background, Vector2.Zero, Color.White);
+            spriteBatch.Draw(background, Vector2.Zero, Color.White);        
             
             for (int c = 0; c < bugs.Count; c++)
             {
@@ -333,6 +352,10 @@ namespace BugSmasher
                 if (!bugs[c].Dead)
                     bugs[c].Draw(spriteBatch);
             }
+            if (Cool && (Score >= 40))
+            {
+                spriteBatch.Draw(Face, Vector2.Zero, Color.White);
+            }
 
             for (int k = 0; k < 100; k++)
             {
@@ -341,7 +364,6 @@ namespace BugSmasher
                     GO.Draw(spriteBatch);
                 }
             }
-            ladybug.Draw(spriteBatch);
             Bar.TintColor = new Color(1, 1, 1, 0.6f);
             Bar.Draw(spriteBatch);
             Progress.Draw(spriteBatch);

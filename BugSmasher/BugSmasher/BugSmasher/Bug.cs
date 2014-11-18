@@ -16,11 +16,19 @@ namespace BugSmasher
         Clickable
     }
 
+    public enum BugTypes
+    {
+        NotALadyBug,
+        LadyBug
+    }
+
     class Bug : Sprite
     {
         public BugStates State;
         public bool Dead = false;
         public static bool Done = false;
+        public BugTypes Type = BugTypes.NotALadyBug;
+        
 
         private Random rand = new Random((int)DateTime.UtcNow.Ticks);
 
